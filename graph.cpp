@@ -40,8 +40,8 @@ void ini_values(int length_matrix[20][20], char* label_array){
 	}
 }
 //Change to replacement algorithm <-----------
-void remove_vertex(char* label, char* label_array, int length_matrix[20][20]){
-	int li = get_index(*label, label_array);
+void remove_vertex(char label, char* label_array, int length_matrix[20][20]){
+	int li = get_index(label, label_array);
 
 	label_array[li] = 0;
 	for (int x = 0; x < 20; x++){
@@ -101,6 +101,9 @@ int main(){
 		std::cin.clear();
 		std::cin.ignore(100, '\n');
 
+		for(int i = 0; i < strlen(input); i++)
+			input[i] = tolower(input[i]);
+
 		if(strcmp(input, "print") == 0){
 			std::cout << std::endl;
 			print_matrix(length_matrix, label_array);
@@ -111,7 +114,7 @@ int main(){
 			std::cin.clear();
 			std::cin.ignore(100, '\n');
 
-			add_vertex(label, label_array);
+			add_vertex(toupper(label), label_array);
 			system("clear");
 			print_matrix(length_matrix, label_array);
 		}else if(strcmp(input, "add edge") == 0){
@@ -136,7 +139,7 @@ int main(){
 			std::cin.clear();
 			std::cin.ignore(100, '\n');
 
-			add_edge(f, s, weight, label_array, length_matrix);
+			add_edge(toupper(f), toupper(s), weight, label_array, length_matrix);
 			system("clear");
 			print_matrix(length_matrix, label_array);
 		}else if(strcmp(input, "remove vertex") == 0){
@@ -148,7 +151,7 @@ int main(){
 			std::cin.clear();
 			std::cin.ignore(100, '\n');
 
-			remove_vertex(&label, label_array, length_matrix);
+			remove_vertex(toupper(label), label_array, length_matrix);
 			system("clear");
 			print_matrix(length_matrix, label_array);
 		}else if(strcmp(input, "remove edge") == 0){
@@ -167,7 +170,7 @@ int main(){
 			std::cin.clear();
 			std::cin.ignore(100, '\n');
 
-			remove_edge(f, s, label_array, length_matrix);
+			remove_edge(toupper(f), toupper(s), label_array, length_matrix);
 			system("clear");
 			print_matrix(length_matrix, label_array);
 		}else if(strcmp(input, "exit") == 0 || strcmp(input, "quit") == 0){
