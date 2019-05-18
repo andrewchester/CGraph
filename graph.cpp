@@ -2,14 +2,14 @@
 #include <vector>
 #include "string.h"
 
-int get_index(char* label, char** label_array){
+int get_index(char label, char* label_array){
 	for (int i = 0; i < sizeof(label_array); i++)
-		if(strcmp(label, label_array[i]) == 0)
+		if(label == label_array[i])
 			return i;
 	return 0;
 }
-void print_matrix(int length_matrix[20][20], char* label_array[20]){
-	int vertices;
+void print_matrix(int length_matrix[20][20], char* label_array){
+	int vertices = 19;
 	std::cout << "  ";
 	for (int i = 0; i < 20; i++){
 		if(label_array[i] == 0){
@@ -26,18 +26,156 @@ void print_matrix(int length_matrix[20][20], char* label_array[20]){
 		}
 		std::cout << std::endl;
 	}
+	std::cout << "------";
+	for(int i = 0; i < vertices; i++)
+		std::cout << "--";
+	std::cout << std::endl;
+}
+void ini_values(int length_matrix[20][20], char* label_array){
+	for(int x = 0; x < 20; x++){
+		label_array[x] = 0;
+		for(int y = 0; y < 20; y++){
+			length_matrix[x][y] = 0;
+		}
+	}
+}
+//Change to replacement algorithm <-----------
+void remove_vertex(char* label, char* label_array, int length_matrix[20][20]){
+	int li = get_index(*label, label_array);
+
+	label_array[li] = 0;
+	for (int x = 0; x < 20; x++){
+		for(int y = 0; y < 20; y++){
+			if (x == li) length_matrix[x][y] = 0;
+			else if(y == li) length_matrix[x][y] = 0;
+		}
+	}
+
+	for (int i = li; i < 20; i++){
+		if(i != 19 && label_array[i + 1] != 0){
+			label_array[i] = label_array[i + 1];
+			label_array[i + 1] = 0;
+
+			for(int y = 0; y < 20; y++){
+				length_matrix[i][y] = length_matrix[i + 1][y];
+				length_matrix[i + 1][y] = 0;
+			}
+			for(int x = 0; x < 20; x++){
+				length_matrix[x][i] = length_matrix[x][i + 1];
+				length_matrix[x][i + 1] = 0;
+			}
+		}
+	}
+}
+void remove_edge(char f, char s, char* label_array, int length_matrix[20][20]){
+	int fi = get_index(f, label_array);
+	int si = get_index(s, label_array);
+	length_matrix[fi][si] = 0;
+	length_matrix[si][fi] = 0;
+}
+void add_vertex(char label, char* label_array){
+	for(int i = 0; i < 20; i++)
+		if (label_array[i] == 0){
+			label_array[i] = label;
+			return;
+		}
+	std::cout << "Max number of nodes" << std::endl;
+}
+void add_edge(char f, char s, int weight, char* label_array, int length_matrix[20][20]){
+	int fi = get_index(f, label_array);
+	int si = get_index(s, label_array);
+
+	length_matrix[fi][si] = weight;
+	length_matrix[si][fi] = weight;
 }
 
 int main(){
 	int length_matrix[20][20];
-	char* labels[20];
-	for (int i = 0; i < 20; i++) labels[i] = 0;
+	char label_array[20];
+	ini_values(length_matrix, label_array);
 
-	labels[0] = (char*)("A");
-	labels[1] = (char*)("B");
-	labels[2] = (char*)("C");
+	char* input = new char[20];
+	while(true){
+		std::cout << "Enter Command(print, add vertex, add edge, remove vertex, remove edge, quit):" << std::endl;
+		std::cin.get(input, 20);
+		std::cin.clear();
+		std::cin.ignore(100, '\n');
 
-	print_matrix(length_matrix, labels);
+		if(strcmp(input, "print") == 0){
+			std::cout << std::endl;
+			print_matrix(length_matrix, label_array);
+		}else if(strcmp(input, "add vertex") == 0){
+			char label;
+			std::cout << "Label: ";
+			std::cin >> label;
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+
+			add_vertex(label, label_array);
+			system("clear");
+			print_matrix(length_matrix, label_array);
+		}else if(strcmp(input, "add edge") == 0){
+			system("clear");
+			print_matrix(length_matrix, label_array);
+			char f;
+			char s;
+			int weight;
+
+			std::cout << "First Vertex: ";
+			std::cin >> f;
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+			
+			std::cout << "Second Vertex: ";
+			std::cin >> s;
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+
+			std::cout << "Weight: ";
+			std::cin >> weight;
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+
+			add_edge(f, s, weight, label_array, length_matrix);
+			system("clear");
+			print_matrix(length_matrix, label_array);
+		}else if(strcmp(input, "remove vertex") == 0){
+			system("clear");
+			print_matrix(length_matrix, label_array);
+			char label;
+			std::cout << "Label: ";
+			std::cin >> label;
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+
+			remove_vertex(&label, label_array, length_matrix);
+			system("clear");
+			print_matrix(length_matrix, label_array);
+		}else if(strcmp(input, "remove edge") == 0){
+			system("clear");
+			print_matrix(length_matrix, label_array);
+			char f;
+			char s;
+
+			std::cout << "First Vertex: ";
+			std::cin >> f;
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+			
+			std::cout << "Second Vertex: ";
+			std::cin >> s;
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+
+			remove_edge(f, s, label_array, length_matrix);
+			system("clear");
+			print_matrix(length_matrix, label_array);
+		}else if(strcmp(input, "exit") == 0 || strcmp(input, "quit") == 0){
+			return 0;
+		}else{
+			std::cout << "Unrecognized Command" << std::endl;
+		}
+	}
 
 	return 0;
 }
