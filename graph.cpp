@@ -3,13 +3,20 @@
 #include "string.h"
 
 int get_index(char label, char* label_array){
-	for (int i = 0; i < sizeof(label_array); i++)
+	for (int i = 0; i < 20; i++)
 		if(label == label_array[i])
 			return i;
 	return 0;
 }
+bool has(char label, char* label_array){
+	for(int i = 0; i < 20; i++)
+		if(label == label_array[i])
+			return true;
+	return false;
+}
+
 void print_matrix(int length_matrix[20][20], char* label_array){
-	int vertices = 19;
+	int vertices = 20;
 	std::cout << "  ";
 	for (int i = 0; i < 20; i++){
 		if(label_array[i] == 0){
@@ -27,7 +34,7 @@ void print_matrix(int length_matrix[20][20], char* label_array){
 		std::cout << std::endl;
 	}
 	std::cout << "------";
-	for(int i = 0; i < vertices; i++)
+	for(int i = 0; i <= vertices; i++)
 		std::cout << "--";
 	std::cout << std::endl;
 }
@@ -39,28 +46,24 @@ void ini_values(int length_matrix[20][20], char* label_array){
 		}
 	}
 }
-//Change to replacement algorithm <-----------
 void remove_vertex(char label, char* label_array, int length_matrix[20][20]){
 	int li = get_index(label, label_array);
 
 	label_array[li] = 0;
-	for (int x = 0; x < 20; x++){
-		for(int y = 0; y < 20; y++){
-			if (x == li) length_matrix[x][y] = 0;
-			else if(y == li) length_matrix[x][y] = 0;
-		}
+	for (int i = 0; i < 20; i++){
+		length_matrix[i][li] = 0;
+		length_matrix[li][i] = 0;
 	}
 
 	for (int i = li; i < 20; i++){
-		if(i != 19 && label_array[i + 1] != 0){
+		if(i != 19){
 			label_array[i] = label_array[i + 1];
 			label_array[i + 1] = 0;
 
-			for(int y = 0; y < 20; y++){
-				length_matrix[i][y] = length_matrix[i + 1][y];
-				length_matrix[i + 1][y] = 0;
-			}
 			for(int x = 0; x < 20; x++){
+				length_matrix[i][x] = length_matrix[i + 1][x];
+				length_matrix[i + 1][x] = 0;
+
 				length_matrix[x][i] = length_matrix[x][i + 1];
 				length_matrix[x][i + 1] = 0;
 			}
@@ -73,13 +76,13 @@ void remove_edge(char f, char s, char* label_array, int length_matrix[20][20]){
 	length_matrix[fi][si] = 0;
 	length_matrix[si][fi] = 0;
 }
-void add_vertex(char label, char* label_array){
+bool add_vertex(char label, char* label_array){
 	for(int i = 0; i < 20; i++)
 		if (label_array[i] == 0){
 			label_array[i] = label;
-			return;
+			return true;
 		}
-	std::cout << "Max number of nodes" << std::endl;
+	return false;
 }
 void add_edge(char f, char s, int weight, char* label_array, int length_matrix[20][20]){
 	int fi = get_index(f, label_array);
@@ -90,6 +93,7 @@ void add_edge(char f, char s, int weight, char* label_array, int length_matrix[2
 }
 
 int main(){
+	system("clear");
 	int length_matrix[20][20];
 	char label_array[20];
 	ini_values(length_matrix, label_array);
@@ -105,7 +109,7 @@ int main(){
 			input[i] = tolower(input[i]);
 
 		if(strcmp(input, "print") == 0){
-			std::cout << std::endl;
+			system("clear");
 			print_matrix(length_matrix, label_array);
 		}else if(strcmp(input, "add vertex") == 0){
 			char label;
@@ -114,9 +118,14 @@ int main(){
 			std::cin.clear();
 			std::cin.ignore(100, '\n');
 
-			add_vertex(toupper(label), label_array);
-			system("clear");
-			print_matrix(length_matrix, label_array);
+			if(!has(toupper(label), label_array))
+				std::cout << "Duplicate Vertex" << std::endl;
+			else if(!add_vertex(toupper(label), label_array))
+				std::cout << "Max Vertices" << std::endl;
+			else{
+				system("clear");
+				print_matrix(length_matrix, label_array);
+			}
 		}else if(strcmp(input, "add edge") == 0){
 			system("clear");
 			print_matrix(length_matrix, label_array);
