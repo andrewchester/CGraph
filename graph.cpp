@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include "string.h"
  
 //All functions assume static length of 20 for all arrays
@@ -105,6 +106,46 @@ void add_edge(char f, char s, int weight, char* label_array, int matrix[20][20])
 	matrix[fi][si] = weight;
 }
 
+char* get_adjacent(char label, int matrix[20][20], char* label_array){
+	std::vector<char> adjacent;
+	int li = get_index(label, label_array);
+
+	for (int y = 0; y < 20; y++)
+		if(matrix[li][y] != 0)
+			adjacent.push_back(label_array[y]);
+
+	char* adjacency_list = new char[adjacent.size()];
+	for(unsigned int i = 0; i < adjacent.size(); i++)
+		adjacency_list[i] = adjacent.at(i);
+	return adjacency_list;
+}
+
+char* find(char f, char s, int matrix[20][20], char* label_array){
+	//use vertex and make_heap/sort_heap to sort by best path
+	std::vector<char> unvisited;
+	std::vector<char> visited;
+	for (int i = 0; i < 20; i++)
+		if(label_array[i] != f)
+			unvisited.push_back(label_array[i]);
+	visited.push_back(f);
+
+	char* adjacent = get_adjacent(f, matrix, label_array);
+	int dist[strlen(adjacent)];
+	int li = get_index(f, label_array);
+	int si;
+	for(int i = 0; i < strlen(adjacent); i++){
+		si = get_index(adjacent[i], label_array);
+		dist[i] = matrix[li][si];
+	}
+	
+	char current = f;
+	while(unvisited.size() != 0){
+		
+	}
+	
+	return "ran";
+}
+
 int main(){
 	system("clear");
 	//Both arrays static at 20
@@ -114,7 +155,7 @@ int main(){
 
 	char* input = new char[20];
 	while(true){
-		std::cout << "Enter Command(print, add vertex, add edge, remove vertex, remove edge, quit):" << std::endl;
+		std::cout << "Enter Command(print, add vertex, add edge, remove vertex, remove edge, find, quit):" << std::endl;
 		std::cin.get(input, 20);
 		std::cin.clear();
 		std::cin.ignore(100, '\n');
@@ -196,6 +237,25 @@ int main(){
 			remove_edge(toupper(f), toupper(s), label_array, matrix);
 			system("clear");
 			print_matrix(matrix, label_array);
+		}else if(strcmp(input, "find") == 0){
+			system("clear");
+			print_matrix(matrix, label_array);
+			char f;
+			char s;
+
+			std::cout << "First Vertex: ";
+			std::cin >> f;
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+			
+			std::cout << "Second Vertex: ";
+			std::cin >> s;
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+
+			system("clear");
+			print_matrix(matrix, label_array);
+			std::cout << find(f, s, matrix, label_array) << std::endl;
 		}else if(strcmp(input, "exit") == 0 || strcmp(input, "quit") == 0){
 			return 0;
 		}else{
