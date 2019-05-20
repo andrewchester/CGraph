@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <utility>
 #include <algorithm>
 #include "string.h"
  
@@ -119,31 +120,20 @@ char* get_adjacent(char label, int matrix[20][20], char* label_array){
 		adjacency_list[i] = adjacent.at(i);
 	return adjacency_list;
 }
+int getcost(char* f, char* s, int matrix[20][20], char* label_array){
+	return matrix[get_index(f, label_array)][get_index(s, label_array)];
+}
 
 char* find(char f, char s, int matrix[20][20], char* label_array){
-	//use vertex and make_heap/sort_heap to sort by best path
-	std::vector<char> unvisited;
-	std::vector<char> visited;
-	for (int i = 0; i < 20; i++)
+	std::vector<char*> unvisited;
+	for (int i = 0; i < strlen(label_array); i++)
 		if(label_array[i] != f)
 			unvisited.push_back(label_array[i]);
-	visited.push_back(f);
-
-	char* adjacent = get_adjacent(f, matrix, label_array);
-	int dist[strlen(adjacent)];
-	int li = get_index(f, label_array);
-	int si;
-	for(int i = 0; i < strlen(adjacent); i++){
-		si = get_index(adjacent[i], label_array);
-		dist[i] = matrix[li][si];
-	}
-	
-	char current = f;
+	std::vector<std::pair<char*, int>> pairs;
+	pairs.append(std::make_pair(f, 0));
 	while(unvisited.size() != 0){
-		
+		for(std::vector<std::pair<char*, int>>::iterator it, it != pairs.end(); ++it)
 	}
-	
-	return "ran";
 }
 
 int main(){
