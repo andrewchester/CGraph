@@ -125,42 +125,40 @@ int getcost (char f, char s, int matrix[20][20], char* label_array) {
 }
 
 std::vector<std::pair<char*, int> >* find (char f, char s, int matrix[20][20], char* label_array) {
-	std::vector<char> unvisited;
-	std::vector<std::pair<char*, int> > pairs;
+	std::vector<char> unvisited = std::vector<char>();
+	std::vector<std::pair<char*, int> > pairs = std::vector<std::pair<char*, int> >();
 	for  (int i = 0; i < strlen (label_array); i++)
 		if (label_array[i] != f)
 			unvisited.push_back (label_array[i]);
-	char* fch = new char;
-	strcpy (fch,  (char*)f);
-	pairs.push_back (std::make_pair (fch, 0));
+	pairs.push_back (std::make_pair (&f, 0));
+	std::cout << "size: " << pairs.size() << ", first element: " << pairs.at(0).first << std::endl;
 	char* c;
 	char* neighbors;
 	int temp;
 	bool found = false;
 	while (unvisited.size () != 0) {
-		std::cout << "looping over pairs" << std::endl;
-		for (std::vector<std::pair<char*, int> >::iterator it; it != pairs.end (); ++it) {
-			c = it->first;
+		for (unsigned int i = 0; i < pairs.size(); i++) {
+			c = pairs.at(i).first;
 			neighbors = get_adjacent (c[strlen (c) - 1], matrix, label_array, c);
-			temp = it->second;
+			std::cout << "neighbors for " << c << ": " << neighbors << std::endl;
+			temp = pairs.at(i).second;
 			if (strlen (neighbors) == 0 && c[strlen (c) - 1] != s) {
-				pairs.erase (it);
+				pairs.erase(pairs.begin() + i);
 				continue;
 			}
 
-			std::cout << "before looping over adjacent" << std::endl;
-
 			for (int i = 0; i < strlen (neighbors); i++) {
-				for (std::vector<std::pair<char*, int> >::iterator p; p != pairs.end (); ++p) {
-					if (c == p->first) {
+				for (unsigned int j = 0; j < pairs.size(); j++) {
+					std::pair<char*, int> p = pairs.at(j);
+					if (c == p.first) {
 						found = true;
 						char* newc = new char[strlen (c)];
 						for  (int x = 0; x < strlen (c); x++)
 							newc[x] = c[x];
 						newc[strlen (c)] = neighbors[i];
-						delete[] p->first;
-						p->first = newc;
-						p->second += getcost (c[strlen (c) - 1], neighbors[i], matrix, label_array);
+						delete[] p.first;
+						p.first = newc;
+						p.second += getcost (c[strlen (c) - 1], neighbors[i], matrix, label_array);
 					}
 				}
 				if (!found) {
