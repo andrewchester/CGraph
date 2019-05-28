@@ -115,6 +115,9 @@ char* get_adjacent (char label, int matrix[20][20], char* label_array, char* exc
 		if (matrix[li][y] != 0 && !has (label_array[y], exclude))
 			adjacent.push_back (label_array[y]);
 
+	if(adjacent.size() == 0)
+		return 0;
+
 	char* adjacency_list = new char[adjacent.size ()];
 	for (unsigned int i = 0; i < adjacent.size (); i++)
 		adjacency_list[i] = adjacent.at (i);
@@ -130,45 +133,38 @@ std::vector<std::pair<char*, int> >* find (char f, char s, int matrix[20][20], c
 	for  (int i = 0; i < strlen (label_array); i++)
 		if (label_array[i] != f)
 			unvisited.push_back (label_array[i]);
-	pairs.push_back (std::make_pair (&f, 0));
-	std::cout << "size: " << pairs.size() << ", first element: " << pairs.at(0).first << std::endl;
-	char* c;
+	char* pch = new char[2];
+	pch[0] = toupper(f); pch[1] = 0;
+	pairs.push_back (std::make_pair (pch, 0));
+	std::cout << pairs[0].first << std::endl;
 	char* neighbors;
 	int temp;
 	bool found = false;
 	while (unvisited.size () != 0) {
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			c = pairs.at(i).first;
-			neighbors = get_adjacent (c[strlen (c) - 1], matrix, label_array, c);
+		std::vector<std::pair<char*, int> >::iterator it;
+		for (it = pairs.begin(); it != pairs.end(); ++it) {
+			char* c = (*it).first;
+			neighbors = get_adjacent (c[strlen(c) - 1], matrix, label_array, c);
 			std::cout << "neighbors for " << c << ": " << neighbors << std::endl;
-			temp = pairs.at(i).second;
-			if (strlen (neighbors) == 0 && c[strlen (c) - 1] != s) {
-				pairs.erase(pairs.begin() + i);
+			temp = (*it).second;
+			if (neighbors == 0 && c[strlen (c) - 1] != s) {
+				//pairs.erase(it);
 				continue;
 			}
-
-			for (int i = 0; i < strlen (neighbors); i++) {
-				for (unsigned int j = 0; j < pairs.size(); j++) {
-					std::pair<char*, int> p = pairs.at(j);
-					if (c == p.first) {
+			for (int x = 0; x < strlen (neighbors); x++) {
+				std::vector<std::pair<char*, int> >::iterator j;
+				for (j = pairs.begin(); j != pairs.end(); ++j) {
+					if (strcmp(c, (*j).first) == 0) {
 						found = true;
-						char* newc = new char[strlen (c)];
-						for  (int x = 0; x < strlen (c); x++)
-							newc[x] = c[x];
-						newc[strlen (c)] = neighbors[i];
-						delete[] p.first;
-						p.first = newc;
-						p.second += getcost (c[strlen (c) - 1], neighbors[i], matrix, label_array);
+						strcat((*j).first, &neighbors[x]);
+						(*j).second += getcost (c[strlen (c) - 1], neighbors[x], matrix, label_array);
 					}
 				}
 				if (!found) {
-					char* newc = new char[strlen (c)];
-					for  (int x = 0; x < strlen (c); x++)
-						newc[x] = c[x];
-					newc[strlen (c)] = neighbors[i];
-					pairs.push_back (std::make_pair (newc, temp + getcost (c[strlen (c) - 1], neighbors[i], matrix, label_array)));	
-				}
-				unvisited.erase (std::find (unvisited.begin (), unvisited.end (), neighbors[i]));
+					strcat(c, (char*)neighbors[x]);
+					pairs.push_back (std::make_pair (c, temp + getcost (c[strlen (c) - 1], neighbors[x], matrix, label_array)));	
+				}	
+				unvisited.erase (std::find (unvisited.begin (), unvisited.end (), neighbors[x]));
 			}
 		}
 	}
